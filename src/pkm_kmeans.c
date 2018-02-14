@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+#define PKM_UNASSIGNED_CENTROID -1
+
 typedef float pkm_datatype;
 
 typedef struct pkm_vector
@@ -34,6 +36,36 @@ pkm_datatype pkm_compute_dist(pkm_vector *v1, pkm_vector *v2)
 		dist += pow(v1->data[i] - v2->data[i], 2);
 
 	return sqrt(dist);
+}
+
+pkm_data_point *pkm_create_data_point(size_t vec_len)
+{
+	/*
+		Don't forget to free the data at the end (dealt with in
+		free_data_point(...)):
+		- first, free(pt->vec->data)
+		- second, free(pt->vec)
+		- third, free(pt)
+	*/
+	pkm_datatype *data = malloc(sizeof(pkm_datatype) * vec_len);
+
+	pkm_vector *vec = malloc(sizeof(pkm_vector));
+	vec->data = data;
+	vec->vec_len = vec_len;
+
+	pkm_data_point *pt = malloc(sizeof(pkm_data_point));
+
+	pt->cluster_id = PKM_UNASSIGNED_CENTROID;
+	pt->vec = vec;
+
+	return pt;
+}
+
+void pkm_free_data_point(pkm_data_point *pt)
+{
+	free(pt->vec->data);
+	free(pt->vec);
+	free(pt);
 }
 
 int main(int argc, char *argv[])
