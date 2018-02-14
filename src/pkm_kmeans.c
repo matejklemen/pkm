@@ -25,16 +25,13 @@ typedef struct pkm_centroid
 } pkm_centroid;
 
 /* Euclidean distance */
-pkm_datatype pkm_compute_dist(pkm_data_point *pt1, pkm_data_point *pt2)
+pkm_datatype pkm_compute_dist(pkm_vector *v1, pkm_vector *v2)
 {
 	pkm_datatype dist = 0;
 
 	// currently assuming vector sizes are equal
-	for(int i = 0; i < pt1->vec->vec_len; i++)
-	{
-		printf("[%f] vs [%f]\n", pt1->vec->data[i], pt2->vec->data[i]);
-		dist += pow(pt1->vec->data[i] - pt2->vec->data[i], 2);
-	}
+	for(int i = 0; i < v1->vec_len; i++)
+		dist += pow(v1->data[i] - v2->data[i], 2);
 
 	return sqrt(dist);
 }
