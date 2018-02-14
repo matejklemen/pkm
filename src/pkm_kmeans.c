@@ -2,11 +2,18 @@
 #include <stdlib.h>
 
 typedef float pkm_datatype;
+
+typedef struct pkm_vector
+{
+	pkm_datatype *data;
+	size_t vec_len;
+} pkm_vector;
+
 typedef struct pkm_data_point
 {
 	// which centroid this point belongs to
 	int cluster_id;
-	pkm_datatype *data;
+	pkm_vector *vec;
 } pkm_data_point;
 
 typedef struct pkm_centroid
