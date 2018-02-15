@@ -53,13 +53,13 @@ void pkm_print_centroid(pkm_centroid *centr)
 }
 
 /* Euclidean distance */
-pkm_datatype pkm_compute_dist(pkm_vector *v1, pkm_vector *v2)
+pkm_datatype pkm_compute_dist(pkm_datatype *v1, pkm_datatype *v2, size_t vec_len)
 {
 	pkm_datatype dist = 0;
 
 	// currently assuming vector sizes are equal
-	for(int i = 0; i < v1->vec_len; i++)
-		dist += pow(v1->data[i] - v2->data[i], 2);
+	for(int i = 0; i < vec_len; i++)
+		dist += pow(v1[i] - v2[i], 2);
 
 	return sqrt(dist);
 }
@@ -96,7 +96,7 @@ void pkm_free_data_point(pkm_data_point *pt)
 
 pkm_centroid *pkm_create_centroid(int cluster_id, int num_members, size_t vec_len)
 {
-	/* Convention: if num_members is <=0, preallocate an array of default size (PKM_DEFAULT_NUM_MEMBERS) for centroid members.*/
+	// convention: if num_members is <=0, preallocate an array of default size (PKM_DEFAULT_NUM_MEMBERS) for centroid members
 	if(num_members <= 0)
 		num_members = PKM_DEFAULT_NUM_MEMBERS;
 
@@ -130,6 +130,48 @@ void pkm_free_centroid(pkm_centroid *centr)
 	free(centr->members);
 	free(centr->center);
 	free(centr);
+}
+
+/* Find the centroid that is closest to data point 'pt'. */
+void pkm_centroid_assignment(pkm_data_point *pt, pkm_centroid **centrs, size_t num_centrs)
+{
+	if(num_centrs == 0)
+		return;
+
+	int assigned_id;
+	pkm_datatype min_dist, curr_dist;
+
+	/*
+		Avoid setting initial min distance to some sentinel value by either:
+		- setting it to distance of point to current assigned centroid or
+		- centroid 0 (if point has no assigned centroid yet)
+	*/
+	if(pt->cluster_id != PKM_UNASSIGNED_CENTROID)
+	{
+		assigned_id = pt->cluster_id;
+		min_dist = pkm_compute_dist(pt->vec->data, centrs[pt->cluster_id]->center, pt->vec->vec_len);
+	}
+	else
+	{
+		assigned_id = 0;
+		min_dist = pkm_compute_dist(pt->vec->data, centrs[0]->center, pt->vec->vec_len);
+	}
+
+	// find closest centroid
+	for(int i = 0; i < num_centrs; i++)
+	{
+		curr_dist = pkm_compute_dist(pt->vec->data, centrs[i]->center, pt->vec->vec_len);
+
+		if(curr_dist < min_dist)
+		{
+			min_dist = curr_dist;
+			assigned_id = i;
+		}
+	}
+
+	pt->cluster_id = assigned_id;
+	printf("Assigned to %d\n", assigned_id);
+	// TODO: add point 'pt' in members list of centroid 'centrs[assigned_id]'
 }
 
 int main(int argc, char *argv[])
