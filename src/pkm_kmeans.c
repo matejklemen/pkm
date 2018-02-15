@@ -28,6 +28,25 @@ typedef struct pkm_centroid
 	pkm_datatype *center;
 } pkm_centroid;
 
+void pkm_print_data_point(pkm_data_point *pt)
+{
+	printf("[");
+	for(int i = 0; i < pt->vec->vec_len; i++)
+		printf(" %f ", pt->vec->data[i]);
+	printf("] [C:%d]\n", pt->cluster_id);
+}
+
+void pkm_print_centroid(pkm_centroid *centr)
+{
+	printf("Cluster %d, center: [");
+	// again assuming that all data points are of equal dimensions
+	for(int i = 0; i < centr->members[0]->vec->vec_len; i++)
+		printf(" %f ", centr->center[i]);
+	printf("]\n");
+
+	// TODO: print out each member
+}
+
 /* Euclidean distance */
 pkm_datatype pkm_compute_dist(pkm_vector *v1, pkm_vector *v2)
 {
@@ -72,8 +91,8 @@ void pkm_free_data_point(pkm_data_point *pt)
 
 pkm_centroid *pkm_create_centroid(int cluster_id, int num_members, size_t vec_len)
 {
-	/* Convention: if num_members is 0, preallocate an array of default size (PKM_DEFAULT_NUM_MEMBERS) for centroid members.*/
-	if(num_members == 0)
+	/* Convention: if num_members is <=0, preallocate an array of default size (PKM_DEFAULT_NUM_MEMBERS) for centroid members.*/
+	if(num_members <= 0)
 		num_members = PKM_DEFAULT_NUM_MEMBERS;
 
 	/*
