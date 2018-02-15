@@ -29,6 +29,7 @@ typedef struct pkm_centroid
 	int num_members;
 	int max_num_members;
 	pkm_datatype *center;
+	size_t center_len;
 } pkm_centroid;
 
 void pkm_print_data_point(pkm_data_point *pt)
@@ -43,11 +44,11 @@ void pkm_print_data_point(pkm_data_point *pt)
 	printf("] [C:%d]\n", pt->cluster_id);
 }
 
-void pkm_print_centroid(pkm_centroid *centr, size_t vec_len)
+void pkm_print_centroid(pkm_centroid *centr)
 {
 	printf("Cluster %d, center: [", centr->cluster_id);
 	// again assuming that all data points are of equal dimensions
-	for(int i = 0; i < vec_len; i++)
+	for(int i = 0; i < centr->center_len; i++)
 		printf(" %f ", centr->center[i]);
 	printf("]\n");
 
@@ -128,6 +129,7 @@ pkm_centroid *pkm_create_centroid(int cluster_id, int num_members, size_t vec_le
 	centr->num_members = 0;
 	centr->max_num_members = num_members;
 	centr->center = center_point;
+	centr->center_len = vec_len;
 
 	return centr;
 }
@@ -209,6 +211,32 @@ void pkm_centroid_assignment(pkm_data_point *pt, pkm_centroid **centrs, size_t n
 	
 	pt->cluster_id = assigned_id;
 	pkm_insert_member(centrs[assigned_id], pt);
+}
+
+void pkm_centroid_update(pkm_centroid *centr)
+{
+	int num_actual_points = 0;
+
+	// reset center of centroid
+	for(int i = 0; i < centr->center_len; i++)
+		centr->center[i] = 0.0f;
+
+	for(int i = 0; i < centr->num_members; i++)
+	{
+		if(centr->members[i] != NULL)
+		{
+			num_actual_points += 1;
+			for(int j = 0; j < centr->center_len; j++)
+				centr->center[j] += centr->members[i]->vec->data[j];
+		}
+	}
+
+	// empty centroid, avoid dividing by zero
+	if(num_actual_points == 0)
+		return;
+
+	for(int i = 0; i < centr->center_len; i++)
+		centr->center[i] /= num_actual_points;
 }
 
 int main(int argc, char *argv[])
