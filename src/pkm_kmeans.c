@@ -43,11 +43,11 @@ void pkm_print_data_point(pkm_data_point *pt)
 	printf("] [C:%d]\n", pt->cluster_id);
 }
 
-void pkm_print_centroid(pkm_centroid *centr)
+void pkm_print_centroid(pkm_centroid *centr, size_t vec_len)
 {
 	printf("Cluster %d, center: [", centr->cluster_id);
 	// again assuming that all data points are of equal dimensions
-	for(int i = 0; i < centr->members[0]->vec->vec_len; i++)
+	for(int i = 0; i < vec_len; i++)
 		printf(" %f ", centr->center[i]);
 	printf("]\n");
 
@@ -140,15 +140,10 @@ void pkm_free_centroid(pkm_centroid *centr)
 }
 
 /*
-	Adds 'new_pt' as a new member of centroid 'centr'. If the members array is 'full' (num_members >= max_num_members), defragmenting is attempted.
-	If it is actually full, allocate a bigger chunk of memory.
+	Adds 'new_pt' as a new member of centroid 'centr'. If members' list is full, allocate a bigger chunk of memory.
 */
-void **pkm_insert_member(pkm_centroid *centr, pkm_data_point *new_pt)
+void pkm_insert_member(pkm_centroid *centr, pkm_data_point *new_pt)
 {
-	if(centr->num_members == centr->max_num_members)
-		// TODO: defragment
-		printf("Here should be defragmentation logic but isn't (yet)!\n");
-
 	/*
 		Allocate twice as much memory for members as was allocated now.
 		NOTE: might get out of hand when dealing with bigger amount of data
@@ -157,7 +152,7 @@ void **pkm_insert_member(pkm_centroid *centr, pkm_data_point *new_pt)
 	if(centr->num_members == centr->max_num_members)
 	{
 		pkm_data_point **new_members = realloc(centr->members, centr->max_num_members << 1);
-			
+
 		centr->members = new_members;
 		centr->max_num_members = centr->max_num_members << 1;
 	}
@@ -165,6 +160,11 @@ void **pkm_insert_member(pkm_centroid *centr, pkm_data_point *new_pt)
 	new_pt->idx_arr = centr->num_members;
 	centr->members[centr->num_members] = new_pt;
 	centr->num_members += 1;
+}
+
+void pkm_remove_member(pkm_centroid *centr, int idx)
+{
+	centr->members[idx] = NULL;
 }
 
 /* Find the centroid that is closest to data point 'pt'. */
@@ -204,6 +204,9 @@ void pkm_centroid_assignment(pkm_data_point *pt, pkm_centroid **centrs, size_t n
 		}
 	}
 
+	if(pt->cluster_id != PKM_UNASSIGNED_CENTROID)
+		pkm_remove_member(centrs[pt->cluster_id], pt->idx_arr);
+	
 	pt->cluster_id = assigned_id;
 	pkm_insert_member(centrs[assigned_id], pt);
 }
