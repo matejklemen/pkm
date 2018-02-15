@@ -18,6 +18,8 @@ typedef struct pkm_data_point
 	// which centroid this point belongs to
 	int cluster_id;
 	pkm_vector *vec;
+	// index on which this data point is stored in some centroid's members array
+	int idx_arr;
 } pkm_data_point;
 
 typedef struct pkm_centroid
@@ -31,6 +33,10 @@ typedef struct pkm_centroid
 
 void pkm_print_data_point(pkm_data_point *pt)
 {
+	// encountered an empty space in the array
+	if(pt == NULL)
+		return;
+
 	printf("[");
 	for(int i = 0; i < pt->vec->vec_len; i++)
 		printf(" %f ", pt->vec->data[i]);
@@ -83,6 +89,7 @@ pkm_data_point *pkm_create_data_point(size_t vec_len)
 	// on init, data points are not assigned to a cluster
 	pt->cluster_id = PKM_UNASSIGNED_CENTROID;
 	pt->vec = vec;
+	pt->idx_arr = PKM_UNASSIGNED_CENTROID;
 
 	return pt;
 }
@@ -132,6 +139,34 @@ void pkm_free_centroid(pkm_centroid *centr)
 	free(centr);
 }
 
+/*
+	Adds 'new_pt' as a new member of centroid 'centr'. If the members array is 'full' (num_members >= max_num_members), defragmenting is attempted.
+	If it is actually full, allocate a bigger chunk of memory.
+*/
+void **pkm_insert_member(pkm_centroid *centr, pkm_data_point *new_pt)
+{
+	if(centr->num_members == centr->max_num_members)
+		// TODO: defragment
+		printf("Here should be defragmentation logic but isn't (yet)!\n");
+
+	/*
+		Allocate twice as much memory for members as was allocated now.
+		NOTE: might get out of hand when dealing with bigger amount of data
+		(so think about how to allocate a more sensible amount of memory).
+	*/
+	if(centr->num_members == centr->max_num_members)
+	{
+		pkm_data_point **new_members = realloc(centr->members, centr->max_num_members << 1);
+			
+		centr->members = new_members;
+		centr->max_num_members = centr->max_num_members << 1;
+	}
+
+	new_pt->idx_arr = centr->num_members;
+	centr->members[centr->num_members] = new_pt;
+	centr->num_members += 1;
+}
+
 /* Find the centroid that is closest to data point 'pt'. */
 void pkm_centroid_assignment(pkm_data_point *pt, pkm_centroid **centrs, size_t num_centrs)
 {
@@ -170,8 +205,7 @@ void pkm_centroid_assignment(pkm_data_point *pt, pkm_centroid **centrs, size_t n
 	}
 
 	pt->cluster_id = assigned_id;
-	printf("Assigned to %d\n", assigned_id);
-	// TODO: add point 'pt' in members list of centroid 'centrs[assigned_id]'
+	pkm_insert_member(centrs[assigned_id], pt);
 }
 
 int main(int argc, char *argv[])
