@@ -23,6 +23,7 @@ typedef struct pkm_centroid
 {
 	int cluster_id;
 	pkm_data_point *members;
+	int num_members;
 	pkm_datatype *center;
 } pkm_centroid;
 
