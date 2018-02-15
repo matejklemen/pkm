@@ -3,6 +3,7 @@
 #include <math.h>
 
 #define PKM_UNASSIGNED_CENTROID -1
+#define PKM_DEFAULT_NUM_MEMBERS 32
 
 typedef float pkm_datatype;
 
@@ -22,7 +23,7 @@ typedef struct pkm_data_point
 typedef struct pkm_centroid
 {
 	int cluster_id;
-	pkm_data_point *members;
+	pkm_data_point **members;
 	int num_members;
 	pkm_datatype *center;
 } pkm_centroid;
@@ -42,8 +43,7 @@ pkm_datatype pkm_compute_dist(pkm_vector *v1, pkm_vector *v2)
 pkm_data_point *pkm_create_data_point(size_t vec_len)
 {
 	/*
-		Don't forget to free the data at the end (dealt with in
-		free_data_point(...)):
+		Don't forget to free the data at the end (dealt with in pkm_free_data_point(...)):
 		- first, free(pt->vec->data)
 		- second, free(pt->vec)
 		- third, free(pt)
@@ -56,6 +56,7 @@ pkm_data_point *pkm_create_data_point(size_t vec_len)
 
 	pkm_data_point *pt = malloc(sizeof(pkm_data_point));
 
+	// on init, data points are not assigned to a cluster
 	pt->cluster_id = PKM_UNASSIGNED_CENTROID;
 	pt->vec = vec;
 
@@ -67,6 +68,43 @@ void pkm_free_data_point(pkm_data_point *pt)
 	free(pt->vec->data);
 	free(pt->vec);
 	free(pt);
+}
+
+pkm_centroid *pkm_create_centroid(int cluster_id, int num_members, size_t vec_len)
+{
+	/* Convention: if num_members is 0, preallocate an array of default size (PKM_DEFAULT_NUM_MEMBERS) for centroid members.*/
+	if(num_members == 0)
+		num_members = PKM_DEFAULT_NUM_MEMBERS;
+
+	/*
+		Don't forget to free the data at the end (dealt with in pkm_free_centroid(...)):
+		- first, free(centr->members)
+		- second, free(centr->center)
+		- third, free(centr)
+	*/
+
+	// allocate centroid
+	pkm_centroid *centr = malloc(sizeof(pkm_centroid));
+
+	// allocate array of pointers to members of centroid
+	pkm_data_point **members = malloc(sizeof(pkm_data_point *) * num_members);
+
+	// allocate space for array that represents the center of centroid
+	pkm_datatype *center_point = malloc(sizeof(pkm_datatype) * vec_len);
+
+	centr->cluster_id = cluster_id;
+	centr->members = members;
+	centr->num_members = num_members;
+	centr->center = center_point;
+
+	return centr;
+}
+
+void pkm_free_centroid(pkm_centroid *centr)
+{
+	free(centr->members);
+	free(centr->center);
+	free(centr);
 }
 
 int main(int argc, char *argv[])
