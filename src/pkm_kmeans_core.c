@@ -1,5 +1,4 @@
 #include "../inc/pkm_kmeans_core.h"
-#include <stdio.h>
 #include <math.h>
 
 #define PKM_UNASSIGNED_CENTROID -1
@@ -246,10 +245,4 @@ void pkm_random_init(pkm_data_point **pts, unsigned int num_data_points, pkm_cen
 		generated_idx = 1 + generated_idx + rand() % (num_data_points - generated_idx - num_centrs + i);
 		pkm_copy_data(pts[generated_idx]->vec->data, centrs[i]->center, centrs[i]->center_len);
 	}
-}
-
-int main(int argc, char *argv[])
-{
-	printf("Parallel KMeans...\n");
-	return 0;
 }
