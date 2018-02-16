@@ -59,6 +59,16 @@ void pkm_print_centroid(pkm_centroid *centr)
 	}
 }
 
+/*
+	Copies data from 'src' to 'dst'.
+	NOTE: does not perform any checks for out of bounds, that's the caller's duty.
+*/
+void pkm_copy_data(pkm datatype *src, pkm_datatype *dst, size_t len)
+{
+	for(int i = 0; i < len; i++)
+		dst[i] = src[i];
+}
+
 /* Euclidean distance */
 pkm_datatype pkm_compute_dist(pkm_datatype *v1, pkm_datatype *v2, size_t vec_len)
 {
@@ -256,14 +266,12 @@ void pkm_random_init(pkm_data_point **pts, unsigned int num_data_points, pkm_cen
 	*/
 
 	unsigned int generated_idx = rand() % (num_data_points - num_centrs + 1);
-	printf("Generated index: %d\n", generated_idx);
-	// TODO: copy data
+	pkm_copy_data(pts[generated_idx]->vec->data, centrs[0]->center, centrs[0]->center_len);
 
 	for(int i = 1; i < num_centrs; i++)
 	{
 		generated_idx = 1 + generated_idx + rand() % (num_data_points - generated_idx - num_centrs + i);
-		printf("Generated index: %d\n", generated_idx);
-		// TODO: copy data
+		pkm_copy_data(pts[generated_idx]->vec->data, centrs[i]->center, centrs[i]->center_len);
 	}
 }
 
