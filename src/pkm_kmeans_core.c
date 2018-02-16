@@ -225,7 +225,7 @@ void pkm_centroid_update(pkm_centroid *centr)
 	Assigns a data point as a center of a centroid (for each centroid).
 	NOTE: if you want seeded random generation, set a seed before calling the function.
 */
-void pkm_random_init(pkm_data_point **pts, unsigned int num_data_points, pkm_centroid **centrs, unsigned int num_centrs)
+void pkm_random_init(pkm_data_point **pts, size_t num_data_points, pkm_centroid **centrs, size_t num_centrs)
 {
 	/*
 		Ad-hoc random number generation (without repetition).
