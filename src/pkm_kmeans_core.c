@@ -1,36 +1,9 @@
+#include "../inc/pkm_kmeans_core.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
 
 #define PKM_UNASSIGNED_CENTROID -1
 #define PKM_DEFAULT_NUM_MEMBERS 32
-
-typedef float pkm_datatype;
-
-typedef struct pkm_vector
-{
-	pkm_datatype *data;
-	size_t vec_len;
-} pkm_vector;
-
-typedef struct pkm_data_point
-{
-	// which centroid this point belongs to
-	int cluster_id;
-	pkm_vector *vec;
-	// index on which this data point is stored in some centroid's members array
-	int idx_arr;
-} pkm_data_point;
-
-typedef struct pkm_centroid
-{
-	int cluster_id;
-	pkm_data_point **members;
-	int num_members;
-	int max_num_members;
-	pkm_datatype *center;
-	size_t center_len;
-} pkm_centroid;
 
 void pkm_print_data_point(pkm_data_point *pt)
 {
@@ -63,7 +36,7 @@ void pkm_print_centroid(pkm_centroid *centr)
 	Copies data from 'src' to 'dst'.
 	NOTE: does not perform any checks for out of bounds, that's the caller's duty.
 */
-void pkm_copy_data(pkm datatype *src, pkm_datatype *dst, size_t len)
+void pkm_copy_data(pkm_datatype *src, pkm_datatype *dst, size_t len)
 {
 	for(int i = 0; i < len; i++)
 		dst[i] = src[i];
