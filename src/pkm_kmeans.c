@@ -239,6 +239,34 @@ void pkm_centroid_update(pkm_centroid *centr)
 		centr->center[i] /= num_actual_points;
 }
 
+/*
+	Assigns a data point as a center of a centroid (for each centroid).
+	NOTE: if you want seeded random generation, set a seed before calling the function.
+*/
+void pkm_random_init(pkm_data_point **pts, unsigned int num_data_points, pkm_centroid **centrs, unsigned int num_centrs)
+{
+	/*
+		Ad-hoc random number generation (without repetition).
+		The downside of this approach is that this can't be parallelized
+		(cluster initialization i dependent on cluster initialization (i - 1)).
+		Another downside is that in practice, the last few generated numbers are
+		very likely to be ..., (num_data_points - 2), (num_data_points - 1).
+		The good thing about this approach is not having to allocate a 'boolean' array
+		or shuffle an array to randomly generate numbers without repetition.
+	*/
+
+	unsigned int generated_idx = rand() % (num_data_points - num_centrs + 1);
+	printf("Generated index: %d\n", generated_idx);
+	// TODO: copy data
+
+	for(int i = 1; i < num_centrs; i++)
+	{
+		generated_idx = 1 + generated_idx + rand() % (num_data_points - generated_idx - num_centrs + i);
+		printf("Generated index: %d\n", generated_idx);
+		// TODO: copy data
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	printf("Parallel KMeans...\n");
