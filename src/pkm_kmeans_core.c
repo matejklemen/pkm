@@ -151,12 +151,16 @@ void pkm_remove_member(pkm_centroid *centr, int idx)
 	centr->members[idx] = NULL;
 }
 
-/* Find the centroid that is closest to data point 'pt'. */
-void pkm_centroid_assignment(pkm_data_point *pt, pkm_centroid **centrs, size_t num_centrs)
+/*
+	Find the centroid that is closest to data point 'pt'.
+	Returns 1 if there was a change in centroid assignment and 0 otherwise.
+*/
+int pkm_centroid_assignment(pkm_data_point *pt, pkm_centroid **centrs, size_t num_centrs)
 {
-	if(num_centrs == 0)
-		return;
+	if(num_centrs <= 0)
+		return 0;
 
+	int prev_id = pt->cluster_id;
 	int assigned_id;
 	pkm_datatype min_dist, curr_dist;
 
@@ -188,11 +192,16 @@ void pkm_centroid_assignment(pkm_data_point *pt, pkm_centroid **centrs, size_t n
 		}
 	}
 
+	if(assigned_id == prev_id)
+		return 0;
+
 	if(pt->cluster_id != PKM_UNASSIGNED_CENTROID)
 		pkm_remove_member(centrs[pt->cluster_id], pt->idx_arr);
 	
 	pt->cluster_id = assigned_id;
 	pkm_insert_member(centrs[assigned_id], pt);
+
+	return 1;
 }
 
 void pkm_centroid_update(pkm_centroid *centr)
