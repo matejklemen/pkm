@@ -42,9 +42,9 @@ void pkm_free_data_point(pkm_data_point *pt);
 pkm_centroid *pkm_create_centroid(int cluster_id, int num_members, size_t vec_len);
 void pkm_free_centroid(pkm_centroid *centr);
 
-void pkm_centroid_assignment(pkm_data_point *pt, pkm_centroid **centrs, size_t num_centrs);
+int pkm_centroid_assignment(pkm_data_point *pt, pkm_centroid **centrs, size_t num_centrs);
 void pkm_centroid_update(pkm_centroid *centr);
 
-void pkm_random_init(pkm_data_point **pts, unsigned int num_data_points, pkm_centroid **centrs, unsigned int num_centrs);
+void pkm_random_init(pkm_data_point **pts, size_t num_data_points, pkm_centroid **centrs, size_t num_centrs);
 
 #endif
