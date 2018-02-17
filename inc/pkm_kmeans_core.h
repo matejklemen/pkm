@@ -1,8 +1,9 @@
-#ifndef PKM_KMEANS_H
-#define PKM_KMEANS_H
+#ifndef PKM_KMEANS_CORE_H
+#define PKM_KMEANS_CORE_H
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 typedef float pkm_datatype;
 
