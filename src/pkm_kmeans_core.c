@@ -1,5 +1,4 @@
 #include "../inc/pkm_kmeans_core.h"
-#include <math.h>
 
 #define PKM_UNASSIGNED_CENTROID -1
 #define PKM_DEFAULT_NUM_MEMBERS 32
@@ -149,6 +148,7 @@ void pkm_insert_member(pkm_centroid *centr, pkm_data_point *new_pt)
 void pkm_remove_member(pkm_centroid *centr, int idx)
 {
 	centr->members[idx] = NULL;
+	centr->num_members -= 1;
 }
 
 /*
