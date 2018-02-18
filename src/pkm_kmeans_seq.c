@@ -1,4 +1,5 @@
 #include "../inc/pkm_kmeans_core.h"
+#include "../inc/pkm_kmeans_visualization.h"
 
 #define TERMINATION_PROPORTION 0.01
 
@@ -19,4 +20,6 @@ void pkm_kmeans_sequential(pkm_data_point **pts, size_t num_pts, pkm_centroid **
 		for(int i = 0; i < num_centrs; i++)
 			pkm_centroid_update(centrs[i]);
 	}
+
+	pkm_visualize_kmeans(centrs, 0, 1);
 }
