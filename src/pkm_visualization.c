@@ -24,10 +24,22 @@ void pkm_draw_axes(cairo_t *context, unsigned int width, unsigned int height)
 	cairo_stroke(context);
 }
 
+void pkm_draw_point(cairo_t *context, unsigned int thickness,
+					unsigned int pt_x, unsigned int pt_y,
+					double color_r, double color_g, double color_b)
+{
+	cairo_set_source_rgb(context, color_r, color_g, color_b);
+	cairo_arc(context, pt_x, pt_y, thickness, 0.0, 2 * M_PI);
+	cairo_fill(context);
+}
+
 void pkm_visualize_kmeans(pkm_centroid **centrs, unsigned int dim1, unsigned int dim2)
 {
 	unsigned int height = 300;
 	unsigned int width = 500;
+
+	unsigned int center_x = width / 2;
+	unsigned int center_y = height / 2;
 
 	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
 	cairo_t *cr = cairo_create(surface); // context
@@ -39,9 +51,9 @@ void pkm_visualize_kmeans(pkm_centroid **centrs, unsigned int dim1, unsigned int
 	cairo_set_source_rgb(cr, 255, 255, 255);
 	cairo_rectangle(cr, 0, 0, width, height);
 	cairo_fill(cr);
-	cairo_stroke(cr);
 
 	pkm_draw_axes(cr, width, height);
+	pkm_draw_point(cr, 2, center_x + 50, center_y + 50, 0.5, 0, 0);
 
 	cairo_destroy(cr);
 	cairo_surface_write_to_png(surface, "test.png");
