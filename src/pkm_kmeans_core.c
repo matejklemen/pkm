@@ -25,8 +25,11 @@ void pkm_print_centroid(pkm_centroid *centr)
 
 	for(int i = 0; i < centr->num_members; i++)
 	{
-		printf("\t");
-		pkm_print_data_point(centr->members[i]);
+		if(centr->members[i] != NULL)
+		{
+			printf("\t");
+			pkm_print_data_point(centr->members[i]);
+		}
 	}
 }
 
