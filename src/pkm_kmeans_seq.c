@@ -21,5 +21,5 @@ void pkm_kmeans_sequential(pkm_data_point **pts, size_t num_pts, pkm_centroid **
 			pkm_centroid_update(centrs[i]);
 	}
 
-	pkm_visualize_kmeans(centrs, 0, 1);
+	pkm_visualize_kmeans(centrs, num_centrs, 0, 1);
 }

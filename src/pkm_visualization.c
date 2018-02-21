@@ -33,16 +33,15 @@ void pkm_draw_point(cairo_t *context, unsigned int thickness,
 	cairo_fill(context);
 }
 
-void pkm_visualize_kmeans(pkm_centroid **centrs, unsigned int dim1, unsigned int dim2)
+void pkm_visualize_kmeans(pkm_centroid **centrs, size_t num_centrs, unsigned int dim1, unsigned int dim2)
 {
 	unsigned int height = 300;
 	unsigned int width = 500;
-
 	unsigned int center_x = width / 2;
 	unsigned int center_y = height / 2;
 
 	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
-	cairo_t *cr = cairo_create(surface); // context
+	cairo_t *cr = cairo_create(surface);
 
 	cairo_set_line_cap(cr, CAIRO_LINE_CAP_SQUARE);
 	cairo_set_line_width(cr, 2);
@@ -53,7 +52,12 @@ void pkm_visualize_kmeans(pkm_centroid **centrs, unsigned int dim1, unsigned int
 	cairo_fill(cr);
 
 	pkm_draw_axes(cr, width, height);
-	pkm_draw_point(cr, 2, center_x + 50, center_y + 50, 0.5, 0, 0);
+
+	// draw centroids
+	for(int i = 0; i < num_centrs; i++)
+		pkm_draw_point(cr, 5, center_x - centrs[i]->center[dim1] * 10, center_y - centrs[i]->center[dim2] * 10, 1.0 / i, i / num_centrs, 1 - i / num_centrs);
+
+	//pkm_draw_point(cr, 2, center_x + 50, center_y + 50, 0.5, 0, 0);
 
 	cairo_destroy(cr);
 	cairo_surface_write_to_png(surface, "test.png");
