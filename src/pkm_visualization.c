@@ -3,6 +3,18 @@
 
 #define SPACE_EMPTY 25
 
+void pkm_draw_background(cairo_t *context,
+						unsigned int width,
+						unsigned int height,
+						double color_r,
+						double color_g,
+						double color_b)
+{
+	cairo_set_source_rgb(context, color_r, color_b, color_g);
+	cairo_rectangle(context, 0, 0, width, height);
+	cairo_fill(context);
+}
+
 void pkm_draw_axes(cairo_t *context, unsigned int width, unsigned int height)
 {
 	cairo_set_source_rgb(context, 0, 0, 0);
@@ -24,9 +36,13 @@ void pkm_draw_axes(cairo_t *context, unsigned int width, unsigned int height)
 	cairo_stroke(context);
 }
 
-void pkm_draw_point(cairo_t *context, unsigned int thickness,
-					unsigned int pt_x, unsigned int pt_y,
-					double color_r, double color_g, double color_b)
+void pkm_draw_point(cairo_t *context,
+					unsigned int thickness,
+					unsigned int pt_x,
+					unsigned int pt_y,
+					double color_r,
+					double color_g,
+					double color_b)
 {
 	cairo_set_source_rgb(context, color_r, color_g, color_b);
 	cairo_arc(context, pt_x, pt_y, thickness, 0.0, 2 * M_PI);
@@ -46,16 +62,12 @@ void pkm_visualize_kmeans(pkm_centroid **centrs, size_t num_centrs, unsigned int
 	cairo_set_line_cap(cr, CAIRO_LINE_CAP_SQUARE);
 	cairo_set_line_width(cr, 2);
 
-	// set up white background
-	cairo_set_source_rgb(cr, 255, 255, 255);
-	cairo_rectangle(cr, 0, 0, width, height);
-	cairo_fill(cr);
-
+	pkm_draw_background(cr, width, height, 1.0, 1.0, 1.0);
 	pkm_draw_axes(cr, width, height);
 
 	// draw centroids
 	for(int i = 0; i < num_centrs; i++)
-		pkm_draw_point(cr, 5, center_x - centrs[i]->center[dim1] * 10, center_y - centrs[i]->center[dim2] * 10, 1.0 / i, i / num_centrs, 1 - i / num_centrs);
+		pkm_draw_point(cr, 5, center_x + centrs[i]->center[dim1] * 10, center_y - centrs[i]->center[dim2] * 10, 1.0 / i, i / num_centrs, 1 - i / num_centrs);
 
 	//pkm_draw_point(cr, 2, center_x + 50, center_y + 50, 0.5, 0, 0);
 
